@@ -3,7 +3,7 @@ POST http://localhost:8082/api/feedback
 Content-Type: application/json
 
 {
-  "name": "mustafa",
+  "name": "",
   "subject": "doubt",
   "email": "mustafa@gmail.com",
   "feedback": "hey mustafa we are creating a cool feedback app"
@@ -27,7 +27,7 @@ Content-Type: application/json
 ###
 
 ## update feedback
-PUT http://localhost:8082/api/feedback/1
+PUT http://localhost:8082/api/feedback/2
 Content-Type: application/json
 
 {

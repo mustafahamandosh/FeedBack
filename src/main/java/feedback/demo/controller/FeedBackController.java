@@ -1,11 +1,12 @@
 package feedback.demo.controller;
 
-import feedback.demo.model.FeedBack;
 import feedback.demo.mail.FeedbackSender;
+import feedback.demo.model.FeedBack;
 import feedback.demo.service.FeedBackService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -27,10 +28,16 @@ public class FeedBackController {
     }
 
     @PostMapping
-    public void sendFeedback(@RequestBody @Valid  FeedBack feedBack,
-                             BindingResult bindingResult){
-        if(bindingResult.hasErrors()){
-            throw new ValidationException("Feedback has errors; Can not send feedback;");
+    public void sendFeedback(@Valid @RequestBody FeedBack feedBack,
+                             BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            List<FieldError> errors = bindingResult.getFieldErrors();
+            String message = null;
+            for (FieldError e : errors) {
+                message = "";
+                message += e.getDefaultMessage();
+            }
+            throw new ValidationException(message);
         }
 
         this.feedbackSender.sendFeedback(
@@ -43,27 +50,27 @@ public class FeedBackController {
     }
 
     @GetMapping
-    public List<FeedBack> getAllFeedback(){
+    public List<FeedBack> getAllFeedback() {
         return this.feedBackService.listFeedBacks();
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id){
+    public void deleteById(@PathVariable Long id) {
         this.feedBackService.deleteById(id);
     }
 
     @GetMapping("/{id}")
-    public FeedBack findById(@PathVariable Long id){
+    public ResponseEntity<FeedBack> findById(@PathVariable Long id) {
         return this.feedBackService.findById(id);
     }
 
     @PutMapping("/{id}")
-    public void updateFeedback(@RequestBody FeedBack feedBack, @PathVariable Long id){
-        this.feedBackService.updateFeedback(feedBack);
+    public ResponseEntity<FeedBack> updateFeedback(@PathVariable Long id, @Valid @RequestBody FeedBack feedback) {
+        return this.feedBackService.updateFeedback(id, feedback);
     }
 
     @GetMapping("/{name}/{email}")
-    public List<FeedBack> findByNameOrEmail(@PathVariable  String name, @PathVariable String email) {
-        return  feedBackService.findByNameOrEmail(name, email);
+    public List<FeedBack> findByNameOrEmail(@PathVariable String name, @PathVariable String email) {
+        return feedBackService.findByNameOrEmail(name, email);
     }
 }
