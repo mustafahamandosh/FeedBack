@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/feedback")
@@ -23,40 +25,42 @@ public class FeedBackController {
 
     private FeedbackSender feedbackSender;
 
+    private List<FieldError> errors = null;
+
+    private String message = "";
+
     public FeedBackController(FeedbackSender feedbackSender) {
         this.feedbackSender = feedbackSender;
     }
 
     @PostMapping
-    public void sendFeedback(@Valid @RequestBody FeedBack feedBack,
-                             BindingResult bindingResult) {
+    public String sendFeedback(@Valid @RequestBody FeedBack feedBack,
+                               BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            String message = null;
+            errors = bindingResult.getFieldErrors();
             for (FieldError e : errors) {
-                message = "";
-                message += e.getDefaultMessage();
+                message = e.getDefaultMessage();
             }
             throw new ValidationException(message);
         }
 
-        this.feedbackSender.sendFeedback(
-                feedBack.getEmail(),
-                feedBack.getName(),
-                feedBack.getSubject(),
-                feedBack.getFeedback());
+//        this.feedbackSender.sendFeedback(
+//                feedBack.getEmail(),
+//                feedBack.getName(),
+//                feedBack.getSubject(),
+//                feedBack.getFeedback());
 
-        this.feedBackService.saveFeedBack(feedBack);
+        return this.feedBackService.saveFeedBack(feedBack);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public List<FeedBack> getAllFeedback() {
         return this.feedBackService.listFeedBacks();
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
-        this.feedBackService.deleteById(id);
+    public Map<String, Boolean> deleteById(@PathVariable Long id) {
+        return this.feedBackService.deleteById(id);
     }
 
     @GetMapping("/{id}")
@@ -65,12 +69,27 @@ public class FeedBackController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FeedBack> updateFeedback(@PathVariable Long id, @Valid @RequestBody FeedBack feedback) {
+    public ResponseEntity<FeedBack> updateFeedback(@PathVariable Long id, @Valid @RequestBody FeedBack feedback,
+                                                   BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            errors = bindingResult.getFieldErrors();
+            for (FieldError e : errors) {
+                message = e.getDefaultMessage();
+            }
+            throw new ValidationException(message);
+        }
         return this.feedBackService.updateFeedback(id, feedback);
     }
 
-    @GetMapping("/{name}/{email}")
-    public List<FeedBack> findByNameOrEmail(@PathVariable String name, @PathVariable String email) {
-        return feedBackService.findByNameOrEmail(name, email);
+    @GetMapping
+    public List<FeedBack> findByNameOrEmail(@Valid @RequestBody FeedBack feedBack, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            errors = bindingResult.getFieldErrors();
+            for (FieldError e : errors) {
+                message = e.getDefaultMessage();
+            }
+            throw new ValidationException(message);
+        }
+        return feedBackService.findByNameOrEmail(feedBack.getName(), feedBack.getEmail());
     }
 }

@@ -3,7 +3,8 @@ package feedback.demo.model;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "Feedback")
@@ -20,27 +21,22 @@ public class FeedBack {
     private Long id;
 
     @Column(name = "person_name")
-    @NotBlank(message = "o nome não pode ser vazio ou nulo")
     @Size(min = 3, message = "nome não pode ser menor que 2 ou maior que 10", max = 10)
     private String name;
 
     @Column(name = "subject")
-    @NotBlank(message = "o assunto não pode ser vazio ou nulo")
     @Size(min = 3, message = "assunto não pode ser menor que 2 ou maior que 30", max = 30)
     private String subject;
 
-    @Email
+    @Email(message = "entre com um endereço de e-mail valido")
     @Column(name = "person_email")
-    @NotBlank(message = "o email não pode ser vazio ou nulo")
     @Size(min = 3, message = "email não pode ser menor que 2 ou maior que 10", max = 100)
     private String email;
 
     @Column(name = "feedback")
-    @NotBlank(message = "o feedback não pode ser vazio ou nulo")
-    @Size(min = 3, message = "feedback não pode ser menor que 2 ou maior que 150", max = 150)
+    @Size(min = 10, message = "feedback não pode ser menor que 10 ou maior que 150", max = 150)
     private String feedback;
 
-    public FeedBack(){
-
+    public FeedBack() {
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +18,12 @@ public class FeedBackService {
     @Autowired
     private FeedbackRepository feedbackRepository;
 
-    public void saveFeedBack(FeedBack feedBack) {
-        feedbackRepository.save(feedBack);
+    public String saveFeedBack(FeedBack feedBack) {
+        String message = null;
+        if (feedbackRepository.save(feedBack) != null) {
+            message = "foi inserido com sucesso";
+        }
+        return message;
     }
 
     public List<FeedBack> listFeedBacks() {
@@ -26,8 +31,8 @@ public class FeedBackService {
     }
 
     public Map<String, Boolean> deleteById(Long id) {
-        FeedBack feedBack = feedbackRepository.findById(id).orElseThrow
-                (() -> new ResourceNotFoundException("O id + " + id + "  + que você inseriu não foi encontrado "));
+        feedbackRepository.findById(id).orElseThrow
+                (() -> new ResourceNotFoundException("O id: " + id + " que você inseriu não foi encontrado "));
         feedbackRepository.deleteById(id);
         Map<String, Boolean> response = new HashMap<>();
         response.put("Deleted", Boolean.TRUE);
@@ -36,7 +41,7 @@ public class FeedBackService {
 
     public ResponseEntity<FeedBack> findById(Long id) throws ResourceNotFoundException {
         FeedBack feedBack = feedbackRepository.findById(id).orElseThrow
-                (() -> new ResourceNotFoundException("O id + " + id + "  + que você inseriu não foi encontrado "));
+                (() -> new ResourceNotFoundException("O id: " + id + " que você inseriu não foi encontrado"));
         return ResponseEntity.ok().body(feedBack);
     }
 
@@ -46,7 +51,7 @@ public class FeedBackService {
 
     public ResponseEntity<FeedBack> updateFeedback(Long id, FeedBack feedBackDetails) {
         FeedBack feedBack = feedbackRepository.findById(id).
-                orElseThrow(() -> new ResourceNotFoundException("O id + " + id + "  + que você inseriu não foi encontrado "));
+                orElseThrow(() -> new ResourceNotFoundException("O id: " + id + " que você inseriu não foi encontrado"));
 
         feedBack.setName(feedBackDetails.getName());
         feedBack.setSubject(feedBackDetails.getSubject());
