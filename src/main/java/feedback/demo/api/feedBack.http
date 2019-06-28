@@ -1,5 +1,5 @@
 ## create a new feedback
-POST http://localhost:8082/api/feedback
+POST http://localhost:8082/api/feedback/save
 Content-Type: application/json
 
 {
