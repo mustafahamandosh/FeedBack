@@ -93,8 +93,5 @@ public class FeedBackController {
         return feedBackService.findByNameOrEmail(feedBack.getName(), feedBack.getEmail());
     }
 
-    @RequestMapping("/")
-    public String home() {
-        return "hello";
-    }
+
 }
