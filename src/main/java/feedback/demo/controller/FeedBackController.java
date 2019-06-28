@@ -94,8 +94,7 @@ public class FeedBackController {
     }
 
     @RequestMapping("/")
-    @ResponseBody
     public String home() {
-        return "Hello World!";
+        return "hello";
     }
 }
